@@ -1,8 +1,8 @@
 function init() {
-  getData(1)
+  getData();
 }
 
-function getData(num) {
+function getData() {
   let bblint = "https://2u-data-curriculum-team.s3.amazonaws.com/dataviz-classroom/v1.1/14-Interactive-Web-Visualizations/02-Homework/samples.json";
   // console.log("This2")
 
@@ -19,18 +19,29 @@ d3.selectAll("#selDataset").on("change", getData2);
 
 function dataSeparated(data){
 
-    let dropdownMenu = d3.select("#selDataset");
-    
-    let dataset = dropdownMenu.property("value");
-    console.log(dataset);
-    // get data names
+    console.log(data)
     let nameID = Object.values(data.names);
     createOptions(nameID);
 
     let samples = Object.values(data.samples);
-    createBarGraph(940,samples);
+    createGraphs(940,samples);
+
+    let metaData = Object.values(data.metadata);
+    cardData(940,metaData);
 
 
+};
+
+function cardData(metaArg,objectArray) {
+  let cardBody = ""
+  let objectItem = objectArray.filter(x => x.id == metaArg);
+  let itemKeys = Object.keys(objectItem[0])
+  let itemValues = Object.values(objectItem[0])
+  for (let i = 0; i < itemKeys.length; i++) {
+    cardBody = cardBody + `<div>${itemKeys[i]} : ${itemValues[i]}</div>`
+  }
+
+  d3.select(".panel-body").html(cardBody)
 };
 
 function refreshData(data) {
@@ -38,7 +49,10 @@ function refreshData(data) {
   let dataset = dropdownMenu.property("value")
   console.log(dataset)
   let samples = Object.values(data.samples)
-  createBarGraph(dataset,samples)
+  createGraphs(dataset,samples)
+
+  let metaData = Object.values(data.metadata);
+  cardData(dataset,metaData);
 };
 
 function createOptions(namesList){
@@ -50,25 +64,19 @@ function createOptions(namesList){
     d3.select("#selDataset").html(optionslist)
 };
 
-function createBarGraph(nameArg, objectArray) {
-    let dropdownMenu = d3.select("#selDataset");
-    let dataset = dropdownMenu.property("value");
-    console.log(dataset);
-    if (dataset != 'undefined') {
-      nameArg = dataset.toString();
-    }
-    
+function createGraphs(nameArg, objectArray) {
+   
     let objectItem = objectArray.filter(x => x.id == nameArg);
     console.log(objectItem);
     let sample_values = objectItem[0].sample_values
     let sample_values10 = sample_values.slice(0,10).reverse();
-    console.log(sample_values);
+    // console.log(sample_values);
     let otu_ids = objectItem[0].otu_ids
     let otu_ids10 = otu_ids.slice(0,10).map(item => { return 'OTU '+ item}).reverse();
-    console.log(otu_ids);
+    // console.log(otu_ids);
     let otu_labels = objectItem[0].otu_labels
     let otu_labels10 = otu_labels.slice(0,10).reverse();
-    console.log(otu_labels);
+    // console.log(otu_labels);
 
     let data = [{
       type: 'bar',
@@ -79,17 +87,24 @@ function createBarGraph(nameArg, objectArray) {
     }]
 
     Plotly.newPlot('bar', data);
+      
+    let data2 = [{
+      x: otu_ids,
+      y: sample_values,
+      text: otu_labels,
+      mode: 'markers',
+      marker: {
+        color: otu_ids,
+        size: sample_values
+      }
+    }];
+
+    Plotly.newPlot('bubble', data2);
+
 }
 
 function optionChanged(value) {
   // console.log(value);
 };
-// for future reference: let olderSimpsons = simpsons.filter(simp => simp.age >30)
-// let nameID = Object.values(data);
-// let sample_values = d3.json("samples.json")
-// let otu_ids  = 
-// let otu_labels =
 
-// const dataPromise = d3.json(url);
-// console.log(samples);
 init();
