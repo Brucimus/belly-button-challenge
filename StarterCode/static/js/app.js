@@ -69,8 +69,28 @@ function cardData(metaArg,objectArray) {
   for (let i = 0; i < itemKeys.length; i++) {
     cardBody = cardBody + `<div>${itemKeys[i]} : ${itemValues[i]}</div>`
   }
-
+  console.log(objectItem[0].wfreq)
   d3.select(".panel-body").html(cardBody)
+
+  var gaugeData = [
+    {
+      domain: { x: [0, 1], y: [0, 1] },
+      value: objectItem[0].wfreq,
+      title: { text: "Weekly Belly Button Washing Frequency" },
+      type: "indicator",
+      mode: "gauge+number",
+      gauge: {
+        axis: { range: [null, 9] },
+        steps: [
+          { range: [0, 3], color: "lightgray" },
+          { range: [3, 6], color: "darkgray"},
+          { range: [6, 9], color: "gray"}
+        ]
+        }
+      }
+  ];
+  
+  Plotly.newPlot('gauge', gaugeData);
 };
 
 // populates bar and bubble graphs
